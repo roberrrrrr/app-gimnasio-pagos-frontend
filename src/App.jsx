@@ -3,8 +3,7 @@ import { MonthCard } from "./components/monthCard";
 import { ClientCard } from "./components/clientCard";
 
 function App() {
-  const URL_BACKEND =
-    import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+  const URL_BACKEND = "https://app-gimnasio-pagos-backend.onrender.com";
 
   const [clientes, setClientes] = useState([]);
   const [nuevoNombre, setNuevoNombre] = useState("");
