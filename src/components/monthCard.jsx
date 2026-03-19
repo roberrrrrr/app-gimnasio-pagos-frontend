@@ -24,7 +24,9 @@ export function MonthCard({ mesActual, setMesActual }) {
   let mesSiguiente = mes + 1 === 13 ? 1 : mes + 1;
   let añoSiguiente = mes + 1 === 13 ? año + 1 : año;
 
-  const cambiarDeMes = (nuevoAño, nuevoMes) => {
+  // Le agregamos la "e" de Evento para forzar al celular a hacer caso
+  const cambiarDeMes = (e, nuevoAño, nuevoMes) => {
+    e.preventDefault();
     const mesFormateado = nuevoMes.toString().padStart(2, "0");
     setMesActual(`${nuevoAño}-${mesFormateado}`);
   };
@@ -44,30 +46,42 @@ export function MonthCard({ mesActual, setMesActual }) {
     (añoSiguiente === añoReal && mesSiguiente > mesReal);
 
   return (
-    <div className="flex justify-between items-center bg-slate-100 p-3 sm:p-4 rounded-xl shadow-inner mb-4 border border-slate-300 gap-2">
+    <div className="flex justify-between items-center bg-lime-300 p-2 sm:p-4 rounded-xl shadow-sm mb-5 border border-slate-300 gap-2">
+      {/* --- BOTÓN IZQUIERDO (Pasado) --- */}
       <button
-        onClick={() => cambiarDeMes(añoAnterior, mesAnterior)}
+        type="button"
+        onClick={(e) => cambiarDeMes(e, añoAnterior, mesAnterior)}
         disabled={bloquearAnterior}
-        // flex-1 asegura que los botones tengan el mismo ancho y el título quede centrado
-        className={`px-3 py-2 rounded-lg transition-colors font-medium text-sm sm:text-base flex-1 flex justify-start ${bloquearAnterior ? "text-slate-300 cursor-not-allowed" : "text-slate-600 hover:text-slate-900 hover:bg-white"}`}
+        className={`px-4 py-3 rounded-lg transition-all font-bold text-xl sm:text-base flex items-center justify-center ${
+          bloquearAnterior
+            ? "bg-slate-50 text-slate-300 cursor-not-allowed"
+            : "bg-slate-100 text-slate-700 hover:bg-slate-200 active:bg-slate-300 shadow-sm"
+        }`}
       >
         &larr;{" "}
-        <span className="hidden sm:inline ml-1">
-          {nombresMeses[mesAnterior - 1]} {añoAnterior}
+        <span className="hidden sm:inline ml-2 text-sm font-medium">
+          {nombresMeses[mesAnterior - 1]}
         </span>
       </button>
 
-      <h2 className="text-base sm:text-xl font-bold text-slate-900 whitespace-nowrap px-2">
+      {/* --- MES ACTUAL (Centro) --- */}
+      <h2 className="text-lg sm:text-xl font-black text-slate-800 whitespace-nowrap text-center flex-1">
         {nombresMeses[mes - 1]} {año}
       </h2>
 
+      {/* --- BOTÓN DERECHO (Futuro) --- */}
       <button
-        onClick={() => cambiarDeMes(añoSiguiente, mesSiguiente)}
+        type="button"
+        onClick={(e) => cambiarDeMes(e, añoSiguiente, mesSiguiente)}
         disabled={bloquearSiguiente}
-        className={`px-3 py-2 rounded-lg transition-colors font-medium text-sm sm:text-base flex-1 flex justify-end ${bloquearSiguiente ? "text-slate-300 cursor-not-allowed" : "text-slate-600 hover:text-slate-900 hover:bg-white"}`}
+        className={`px-4 py-3 rounded-lg transition-all font-bold text-xl sm:text-base flex items-center justify-center ${
+          bloquearSiguiente
+            ? "bg-slate-50 text-slate-300 cursor-not-allowed"
+            : "bg-slate-100 text-slate-700 hover:bg-slate-200 active:bg-slate-300 shadow-sm"
+        }`}
       >
-        <span className="hidden sm:inline mr-1">
-          {nombresMeses[mesSiguiente - 1]} {añoSiguiente}
+        <span className="hidden sm:inline mr-2 text-sm font-medium">
+          {nombresMeses[mesSiguiente - 1]}
         </span>{" "}
         &rarr;
       </button>
