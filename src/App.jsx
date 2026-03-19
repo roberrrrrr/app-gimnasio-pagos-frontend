@@ -77,7 +77,7 @@ function App() {
 
   return (
     // py-4 en celu, py-8 en pc. px-2 en celu, px-4 en pc.
-    <div className="min-h-screen bg-amber-50 py-4 sm:py-8 px-2 sm:px-4">
+    <div className="min-h-screen bg-cyan-900 py-4 sm:py-8 px-2 sm:px-4">
       <div className="max-w-3xl mx-auto">
         {/* --- Formulario --- */}
         {/* flex-col (uno abajo del otro) por defecto. sm:flex-row (de costado) en PC */}
