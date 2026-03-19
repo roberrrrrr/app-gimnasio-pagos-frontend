@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { MonthCard } from "./components/monthCard";
-import { ClientCard } from "./components/clientCard";
+import { MonthCard } from "./components/monthCard"; // Asegurate de usar Mayúsculas si así se llama el archivo
+import { ClientCard } from "./components/mlientCard";
 
 function App() {
   const URL_BACKEND = "https://app-gimnasio-pagos-backend.onrender.com";
@@ -18,14 +18,15 @@ function App() {
       const respuesta = await fetch(
         `${URL_BACKEND}/api/clientes?mes=${mesActual}`,
       );
+      if (!respuesta.ok) return setClientes([]); // Evita errores si el back falla
       const data = await respuesta.json();
       setClientes(data);
     } catch (error) {
       console.error("Error al buscar clientes", error);
+      setClientes([]);
     }
   };
 
-  // Se vuelve a disparar cada vez que cambiamos de mes en el Header
   useEffect(() => {
     obtenerClientes();
   }, [mesActual]);
@@ -39,7 +40,7 @@ function App() {
         body: JSON.stringify({ nombre: nuevoNombre }),
       });
       setNuevoNombre("");
-      obtenerClientes(); // Recargamos la lista
+      obtenerClientes();
     } catch (error) {
       alert("Error al guardar cliente");
     }
@@ -52,7 +53,7 @@ function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cliente_id, mes: mesActual }),
       });
-      obtenerClientes(); // Recargamos para que se ponga en verde
+      obtenerClientes();
     } catch (error) {
       alert("Error al registrar el pago");
     }
@@ -68,35 +69,42 @@ function App() {
       await fetch(`${URL_BACKEND}/api/clientes/${id}`, {
         method: "DELETE",
       });
-      obtenerClientes(); // Recargamos la lista
+      obtenerClientes();
     } catch (error) {
       alert("Error al eliminar cliente");
     }
   };
 
   return (
-    <div className="min-h-screen bg-amber-100 py-8 px-4">
+    // py-4 en celu, py-8 en pc. px-2 en celu, px-4 en pc.
+    <div className="min-h-screen bg-amber-50 py-4 sm:py-8 px-2 sm:px-4">
       <div className="max-w-3xl mx-auto">
-        {/* Formulario ARRIBA de la lista */}
-        {/* Formulario ARRIBA de la lista */}
-        <div className="mb-4 bg-white p-4 rounded-xl shadow-sm flex gap-2 border border-slate-300">
+        {/* --- Formulario --- */}
+        {/* flex-col (uno abajo del otro) por defecto. sm:flex-row (de costado) en PC */}
+        <div className="mb-6 bg-white p-4 rounded-xl shadow-sm flex flex-col sm:flex-row gap-3 border border-slate-300">
           <input
             type="text"
             placeholder="Nombre del nuevo cliente..."
             value={nuevoNombre}
             onChange={(e) => setNuevoNombre(e.target.value)}
-            className="flex-1 bg-slate-50 border-2 border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500 transition-all font-medium"
+            // w-full por defecto.
+            className="w-full sm:flex-1 bg-slate-50 border-2 border-slate-300 rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500 transition-all font-medium"
           />
           <button
             onClick={agregarCliente}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
+            // w-full en celu.
+            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-colors text-base"
           >
             Agregar
           </button>
         </div>
+
+        {/* --- Header de Mes --- */}
         <MonthCard mesActual={mesActual} setMesActual={setMesActual} />
-        {/* Lista de Clientes */}
-        <div className="flex flex-col gap-1">
+
+        {/* --- Lista de Clientes --- */}
+        {/* gap-2 para separar un poco más las tarjetas en celu */}
+        <div className="flex flex-col gap-2.5 mt-4">
           {clientes.map((cliente) => (
             <ClientCard
               key={cliente.id}
@@ -108,8 +116,8 @@ function App() {
           ))}
 
           {clientes.length === 0 && (
-            <div className="text-center text-slate-500 py-8 bg-white rounded-xl shadow-sm border border-dashed border-slate-300">
-              No hay clientes anotados .
+            <div className="text-center text-slate-500 py-10 bg-white rounded-xl shadow-sm border border-dashed border-slate-300 px-4">
+              No hay clientes anotados en este mes.
             </div>
           )}
         </div>
