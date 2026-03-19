@@ -81,24 +81,23 @@ function App() {
       <div className="max-w-3xl mx-auto">
         {/* --- Formulario --- */}
         {/* flex-col (uno abajo del otro) por defecto. sm:flex-row (de costado) en PC */}
-        <div className="mb-6 bg-white p-4 rounded-xl shadow-sm flex flex-col sm:flex-row gap-3 border border-slate-300">
+        <div className="mb-4 bg-white p-3 sm:p-4 rounded-xl shadow-sm flex gap-2 border border-slate-300">
           <input
             type="text"
-            placeholder="Nombre del nuevo cliente..."
+            placeholder="Nuevo cliente..."
             value={nuevoNombre}
             onChange={(e) => setNuevoNombre(e.target.value)}
-            // w-full por defecto.
-            className="w-full sm:flex-1 bg-slate-50 border-2 border-slate-300 rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500 transition-all font-medium"
+            // min-w-0 es la magia para que el input no empuje al botón fuera de la pantalla
+            className="flex-1 min-w-0 bg-slate-50 border-2 border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 transition-all font-medium text-sm sm:text-base"
           />
           <button
             onClick={agregarCliente}
-            // w-full en celu.
-            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-colors text-base"
+            // whitespace-nowrap evita que el texto del botón se rompa en dos líneas
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm sm:text-base whitespace-nowrap"
           >
             Agregar
           </button>
         </div>
-
         {/* --- Header de Mes --- */}
         <MonthCard mesActual={mesActual} setMesActual={setMesActual} />
 
