@@ -65,7 +65,7 @@ function App() {
     if (!confirmar) return;
 
     try {
-      await fetch(`h${URL_BACKEND}/api/clientes/${id}`, {
+      await fetch(`${URL_BACKEND}/api/clientes/${id}`, {
         method: "DELETE",
       });
       obtenerClientes(); // Recargamos la lista
