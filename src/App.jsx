@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { MonthCard } from "./components/monthCard"; // Asegurate de usar Mayúsculas si así se llama el archivo
-import { ClientCard } from "./components/mlientCard";
+import { ClientCard } from "./components/clientCard";
 
 function App() {
   const URL_BACKEND = "https://app-gimnasio-pagos-backend.onrender.com";
