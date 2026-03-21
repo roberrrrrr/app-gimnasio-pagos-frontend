@@ -36,6 +36,7 @@ function App() {
   const obtenerClientes = useCallback(async (mesObjetivo, opciones = {}) => {
     const { mostrarCarga = true, forzarRefetch = false } = opciones;
 
+    // 1. Revisamos si ya está en caché
     if (!forzarRefetch && cacheClientesPorMes.current[mesObjetivo]) {
       if (mesObjetivo === mesActual) {
         setClientes(cacheClientesPorMes.current[mesObjetivo]);
@@ -45,6 +46,7 @@ function App() {
     }
 
     if (mostrarCarga && mesObjetivo === mesActual) setCargando(true);
+    
     try {
       const respuesta = await fetch(
         `${URL_BACKEND}/api/clientes?mes=${mesObjetivo}`,
@@ -54,10 +56,30 @@ function App() {
         if (mesObjetivo === mesActual) setClientes([]);
         return [];
       }
+      
       const data = await respuesta.json();
-      cacheClientesPorMes.current[mesObjetivo] = data;
-      if (mesObjetivo === mesActual) setClientes(data);
-      return data;
+
+      // --- 2. ORDENAMIENTO (Pendientes arriba, Pagados abajo, Alfabético) ---
+      const dataOrdenada = data.sort((a, b) => {
+        // Chequeamos si el estado es "pagado" (si en tu DB le pusiste otro nombre, cambialo acá)
+        const aPagado = a.estado === "pagado";
+        const bPagado = b.estado === "pagado";
+
+        // Si 'a' pagó y 'b' no, empujamos 'a' para el final de la lista
+        if (aPagado && !bPagado) return 1;
+        // Si 'b' pagó y 'a' no, empujamos 'b' para el final de la lista
+        if (!aPagado && bPagado) return -1;
+
+        // Si ambos están en el mismo grupo, ordenamos por nombre de la A a la Z
+        return a.nombre.localeCompare(b.nombre);
+      });
+
+      // 3. Guardamos en caché y seteamos el estado con la lista YA ordenada
+      cacheClientesPorMes.current[mesObjetivo] = dataOrdenada;
+      if (mesObjetivo === mesActual) setClientes(dataOrdenada);
+      
+      return dataOrdenada;
+      
     } catch (error) {
       console.error("Error al buscar clientes", error);
       if (mesObjetivo === mesActual) setClientes([]);
