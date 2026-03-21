@@ -7,26 +7,28 @@ function App() {
 
   const [clientes, setClientes] = useState([]);
   const [nuevoNombre, setNuevoNombre] = useState("");
-
+  const [cargando, setCargando] = useState(true);
   // Arrancamos en el mes real actual por defecto
   const fechaHoy = new Date();
   const mesInicial = `${fechaHoy.getFullYear()}-${(fechaHoy.getMonth() + 1).toString().padStart(2, "0")}`;
   const [mesActual, setMesActual] = useState(mesInicial);
 
   const obtenerClientes = async () => {
+    setCargando(true); // 2. Empezamos a cargar
     try {
       const respuesta = await fetch(
         `${URL_BACKEND}/api/clientes?mes=${mesActual}`,
       );
-      if (!respuesta.ok) return setClientes([]); // Evita errores si el back falla
+      if (!respuesta.ok) return setClientes([]);
       const data = await respuesta.json();
       setClientes(data);
     } catch (error) {
       console.error("Error al buscar clientes", error);
       setClientes([]);
+    } finally {
+      setCargando(false); // 3. Terminamos de cargar, pase lo que pase
     }
   };
-
   useEffect(() => {
     obtenerClientes();
   }, [mesActual]);
@@ -41,7 +43,7 @@ function App() {
       });
       setNuevoNombre("");
       obtenerClientes();
-    } catch (error) {
+    } catch {
       alert("Error al guardar cliente");
     }
   };
@@ -54,7 +56,7 @@ function App() {
         body: JSON.stringify({ cliente_id, mes: mesActual }),
       });
       obtenerClientes();
-    } catch (error) {
+    } catch {
       alert("Error al registrar el pago");
     }
   };
@@ -70,7 +72,7 @@ function App() {
         method: "DELETE",
       });
       obtenerClientes();
-    } catch (error) {
+    } catch {
       alert("Error al eliminar cliente");
     }
   };
@@ -99,25 +101,40 @@ function App() {
           </button>
         </div>
         {/* --- Header de Mes --- */}
-        <MonthCard mesActual={mesActual} setMesActual={setMesActual} />
+        <MonthCard
+          key={mesActual}
+          mesActual={mesActual}
+          setMesActual={setMesActual}
+        />
 
         {/* --- Lista de Clientes --- */}
         {/* gap-2 para separar un poco más las tarjetas en celu */}
+        {/* --- Lista de Clientes --- */}
         <div className="flex flex-col gap-2.5 mt-4">
-          {clientes.map((cliente) => (
-            <ClientCard
-              key={cliente.id}
-              cliente={cliente}
-              mesActual={mesActual}
-              eliminarCliente={eliminarCliente}
-              registrarPago={registrarPago}
-            />
-          ))}
-
-          {clientes.length === 0 && (
-            <div className="text-center text-slate-500 py-10 bg-white rounded-xl shadow-sm border border-dashed border-slate-300 px-4">
-              No hay clientes anotados en este mes.
+          {/* Mostramos esto SI está cargando */}
+          {cargando ? (
+            <div className="text-center text-blue-600 py-10 bg-white rounded-xl shadow-sm border border-slate-300 font-semibold animate-pulse">
+              Cargando clientes... ⏳
             </div>
+          ) : (
+            /* Si NO está cargando, mostramos los clientes (o el mensaje de vacío) */
+            <>
+              {clientes.map((cliente) => (
+                <ClientCard
+                  key={cliente.id}
+                  cliente={cliente}
+                  mesActual={mesActual}
+                  eliminarCliente={eliminarCliente}
+                  registrarPago={registrarPago}
+                />
+              ))}
+
+              {clientes.length === 0 && (
+                <div className="text-center text-slate-500 py-10 bg-white rounded-xl shadow-sm border border-dashed border-slate-300 px-4">
+                  No hay clientes anotados en este mes.
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

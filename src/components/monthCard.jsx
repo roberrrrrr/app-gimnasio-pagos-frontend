@@ -15,8 +15,15 @@ export function MonthCard({ mesActual, setMesActual }) {
   ];
 
   const [yearStr, monthStr] = mesActual.split("-");
-  let año = parseInt(yearStr);
-  let mes = parseInt(monthStr);
+  let año = Number.parseInt(yearStr, 10);
+  let mes = Number.parseInt(monthStr, 10);
+
+  // Fallback defensivo para evitar estados inválidos en navegadores móviles.
+  if (!Number.isInteger(año) || !Number.isInteger(mes) || mes < 1 || mes > 12) {
+    const fechaActual = new Date();
+    año = fechaActual.getFullYear();
+    mes = fechaActual.getMonth() + 1;
+  }
 
   let mesAnterior = mes - 1 === 0 ? 12 : mes - 1;
   let añoAnterior = mes - 1 === 0 ? año - 1 : año;
@@ -24,9 +31,7 @@ export function MonthCard({ mesActual, setMesActual }) {
   let mesSiguiente = mes + 1 === 13 ? 1 : mes + 1;
   let añoSiguiente = mes + 1 === 13 ? año + 1 : año;
 
-  // Le agregamos la "e" de Evento para forzar al celular a hacer caso
-  const cambiarDeMes = (e, nuevoAño, nuevoMes) => {
-    e.preventDefault();
+  const cambiarDeMes = (nuevoAño, nuevoMes) => {
     const mesFormateado = nuevoMes.toString().padStart(2, "0");
     setMesActual(`${nuevoAño}-${mesFormateado}`);
   };
@@ -46,11 +51,11 @@ export function MonthCard({ mesActual, setMesActual }) {
     (añoSiguiente === añoReal && mesSiguiente > mesReal);
 
   return (
-    <div className="flex justify-between items-center bg-lime-300 p-2 sm:p-4 rounded-xl shadow-sm mb-5 border border-slate-300 gap-2">
+    <div className="flex justify-between items-center bg-violet-400 p-2 sm:p-4 rounded-xl shadow-sm mb-5 border border-slate-300 gap-2">
       {/* --- BOTÓN IZQUIERDO (Pasado) --- */}
       <button
         type="button"
-        onClick={(e) => cambiarDeMes(e, añoAnterior, mesAnterior)}
+        onClick={() => cambiarDeMes(añoAnterior, mesAnterior)}
         disabled={bloquearAnterior}
         className={`px-4 py-3 rounded-lg transition-all font-bold text-xl sm:text-base flex items-center justify-center ${
           bloquearAnterior
@@ -72,7 +77,7 @@ export function MonthCard({ mesActual, setMesActual }) {
       {/* --- BOTÓN DERECHO (Futuro) --- */}
       <button
         type="button"
-        onClick={(e) => cambiarDeMes(e, añoSiguiente, mesSiguiente)}
+        onClick={() => cambiarDeMes(añoSiguiente, mesSiguiente)}
         disabled={bloquearSiguiente}
         className={`px-4 py-3 rounded-lg transition-all font-bold text-xl sm:text-base flex items-center justify-center ${
           bloquearSiguiente
