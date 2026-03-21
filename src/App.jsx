@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { MonthCard } from "./components/monthCard"; // Asegurate de usar Mayúsculas si así se llama el archivo
 import { ClientCard } from "./components/clientCard";
 
@@ -12,26 +12,70 @@ function App() {
   const fechaHoy = new Date();
   const mesInicial = `${fechaHoy.getFullYear()}-${(fechaHoy.getMonth() + 1).toString().padStart(2, "0")}`;
   const [mesActual, setMesActual] = useState(mesInicial);
+  const cacheClientesPorMes = useRef({});
 
-  const obtenerClientes = async () => {
-    setCargando(true); // 2. Empezamos a cargar
+  const formatearMes = useCallback(
+    (año, mes) => `${año}-${mes.toString().padStart(2, "0")}`,
+    [],
+  );
+
+  const sumarMeses = useCallback(
+    (mesBase, desplazamiento) => {
+      const [añoStr, mesStr] = mesBase.split("-");
+      const fecha = new Date(
+        Number.parseInt(añoStr, 10),
+        Number.parseInt(mesStr, 10) - 1,
+        1,
+      );
+      fecha.setMonth(fecha.getMonth() + desplazamiento);
+      return formatearMes(fecha.getFullYear(), fecha.getMonth() + 1);
+    },
+    [formatearMes],
+  );
+
+  const obtenerClientes = useCallback(async (mesObjetivo, opciones = {}) => {
+    const { mostrarCarga = true, forzarRefetch = false } = opciones;
+
+    if (!forzarRefetch && cacheClientesPorMes.current[mesObjetivo]) {
+      if (mesObjetivo === mesActual) {
+        setClientes(cacheClientesPorMes.current[mesObjetivo]);
+        setCargando(false);
+      }
+      return cacheClientesPorMes.current[mesObjetivo];
+    }
+
+    if (mostrarCarga && mesObjetivo === mesActual) setCargando(true);
     try {
       const respuesta = await fetch(
-        `${URL_BACKEND}/api/clientes?mes=${mesActual}`,
+        `${URL_BACKEND}/api/clientes?mes=${mesObjetivo}`,
       );
-      if (!respuesta.ok) return setClientes([]);
+      if (!respuesta.ok) {
+        cacheClientesPorMes.current[mesObjetivo] = [];
+        if (mesObjetivo === mesActual) setClientes([]);
+        return [];
+      }
       const data = await respuesta.json();
-      setClientes(data);
+      cacheClientesPorMes.current[mesObjetivo] = data;
+      if (mesObjetivo === mesActual) setClientes(data);
+      return data;
     } catch (error) {
       console.error("Error al buscar clientes", error);
-      setClientes([]);
+      if (mesObjetivo === mesActual) setClientes([]);
+      return [];
     } finally {
-      setCargando(false); // 3. Terminamos de cargar, pase lo que pase
+      if (mesObjetivo === mesActual) setCargando(false);
     }
-  };
-  useEffect(() => {
-    obtenerClientes();
   }, [mesActual]);
+
+  useEffect(() => {
+    obtenerClientes(mesActual, { mostrarCarga: true });
+
+    // Prefetch de meses adyacentes para que la navegación sea instantánea.
+    const mesAnterior = sumarMeses(mesActual, -1);
+    const mesSiguiente = sumarMeses(mesActual, 1);
+    obtenerClientes(mesAnterior, { mostrarCarga: false });
+    obtenerClientes(mesSiguiente, { mostrarCarga: false });
+  }, [mesActual, obtenerClientes, sumarMeses]);
 
   const agregarCliente = async () => {
     if (nuevoNombre.trim() === "") return;
@@ -42,7 +86,7 @@ function App() {
         body: JSON.stringify({ nombre: nuevoNombre }),
       });
       setNuevoNombre("");
-      obtenerClientes();
+      await obtenerClientes(mesActual, { forzarRefetch: true });
     } catch {
       alert("Error al guardar cliente");
     }
@@ -55,7 +99,7 @@ function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cliente_id, mes: mesActual }),
       });
-      obtenerClientes();
+      await obtenerClientes(mesActual, { forzarRefetch: true });
     } catch {
       alert("Error al registrar el pago");
     }
@@ -71,7 +115,7 @@ function App() {
       await fetch(`${URL_BACKEND}/api/clientes/${id}`, {
         method: "DELETE",
       });
-      obtenerClientes();
+      await obtenerClientes(mesActual, { forzarRefetch: true });
     } catch {
       alert("Error al eliminar cliente");
     }
