@@ -51,7 +51,7 @@ export function MonthCard({ mesActual, setMesActual }) {
     (añoSiguiente === añoReal && mesSiguiente > mesReal);
 
   return (
-    <div className="flex justify-between items-center bg-violet-400 p-2 sm:p-4 rounded-xl shadow-sm mb-5 border border-slate-300 gap-2">
+    <div className="flex justify-between items-center bg-secondary p-2 sm:p-4 rounded-xl shadow-sm mb-5 border border-neutral-300 gap-2">
       {/* --- BOTÓN IZQUIERDO (Pasado) --- */}
       <button
         type="button"
@@ -59,8 +59,8 @@ export function MonthCard({ mesActual, setMesActual }) {
         disabled={bloquearAnterior}
         className={`px-4 py-3 rounded-lg transition-all font-bold text-xl sm:text-base flex items-center justify-center ${
           bloquearAnterior
-            ? "bg-slate-50 text-slate-300 cursor-not-allowed"
-            : "bg-slate-100 text-slate-700 hover:bg-slate-200 active:bg-slate-300 shadow-sm"
+            ? "bg-neutral-50 text-neutral-300 cursor-not-allowed"
+            : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200 active:bg-neutral-300 shadow-sm"
         }`}
       >
         &larr;{" "}
@@ -70,7 +70,7 @@ export function MonthCard({ mesActual, setMesActual }) {
       </button>
 
       {/* --- MES ACTUAL (Centro) --- */}
-      <h2 className="text-lg sm:text-xl font-black text-slate-800 whitespace-nowrap text-center flex-1">
+      <h2 className="text-lg sm:text-xl font-black text-neutral-800 whitespace-nowrap text-center flex-1">
         {nombresMeses[mes - 1]} {año}
       </h2>
 
@@ -81,8 +81,8 @@ export function MonthCard({ mesActual, setMesActual }) {
         disabled={bloquearSiguiente}
         className={`px-4 py-3 rounded-lg transition-all font-bold text-xl sm:text-base flex items-center justify-center ${
           bloquearSiguiente
-            ? "bg-slate-50 text-slate-300 cursor-not-allowed"
-            : "bg-slate-100 text-slate-700 hover:bg-slate-200 active:bg-slate-300 shadow-sm"
+            ? "bg-neutral-50 text-neutral-300 cursor-not-allowed"
+            : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200 active:bg-neutral-300 shadow-sm"
         }`}
       >
         <span className="hidden sm:inline mr-2 text-sm font-medium">
