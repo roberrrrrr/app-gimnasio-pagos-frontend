@@ -33,61 +33,63 @@ function App() {
     [formatearMes],
   );
 
-  const obtenerClientes = useCallback(async (mesObjetivo, opciones = {}) => {
-    const { mostrarCarga = true, forzarRefetch = false } = opciones;
+  const obtenerClientes = useCallback(
+    async (mesObjetivo, opciones = {}) => {
+      const { mostrarCarga = true, forzarRefetch = false } = opciones;
 
-    // 1. Revisamos si ya está en caché
-    if (!forzarRefetch && cacheClientesPorMes.current[mesObjetivo]) {
-      if (mesObjetivo === mesActual) {
-        setClientes(cacheClientesPorMes.current[mesObjetivo]);
-        setCargando(false);
+      // 1. Revisamos si ya está en caché
+      if (!forzarRefetch && cacheClientesPorMes.current[mesObjetivo]) {
+        if (mesObjetivo === mesActual) {
+          setClientes(cacheClientesPorMes.current[mesObjetivo]);
+          setCargando(false);
+        }
+        return cacheClientesPorMes.current[mesObjetivo];
       }
-      return cacheClientesPorMes.current[mesObjetivo];
-    }
 
-    if (mostrarCarga && mesObjetivo === mesActual) setCargando(true);
-    
-    try {
-      const respuesta = await fetch(
-        `${URL_BACKEND}/api/clientes?mes=${mesObjetivo}`,
-      );
-      if (!respuesta.ok) {
-        cacheClientesPorMes.current[mesObjetivo] = [];
+      if (mostrarCarga && mesObjetivo === mesActual) setCargando(true);
+
+      try {
+        const respuesta = await fetch(
+          `${URL_BACKEND}/api/clientes?mes=${mesObjetivo}`,
+        );
+        if (!respuesta.ok) {
+          cacheClientesPorMes.current[mesObjetivo] = [];
+          if (mesObjetivo === mesActual) setClientes([]);
+          return [];
+        }
+
+        const data = await respuesta.json();
+
+        // --- 2. ORDENAMIENTO (Pendientes arriba, Pagados abajo, Alfabético) ---
+        const dataOrdenada = data.sort((a, b) => {
+          // Chequeamos si el estado es "pagado" (si en tu DB le pusiste otro nombre, cambialo acá)
+          const aPagado = a.estado === "pagado";
+          const bPagado = b.estado === "pagado";
+
+          // Si 'a' pagó y 'b' no, empujamos 'a' para el final de la lista
+          if (aPagado && !bPagado) return 1;
+          // Si 'b' pagó y 'a' no, empujamos 'b' para el final de la lista
+          if (!aPagado && bPagado) return -1;
+
+          // Si ambos están en el mismo grupo, ordenamos por nombre de la A a la Z
+          return a.nombre.localeCompare(b.nombre);
+        });
+
+        // 3. Guardamos en caché y seteamos el estado con la lista YA ordenada
+        cacheClientesPorMes.current[mesObjetivo] = dataOrdenada;
+        if (mesObjetivo === mesActual) setClientes(dataOrdenada);
+
+        return dataOrdenada;
+      } catch (error) {
+        console.error("Error al buscar clientes", error);
         if (mesObjetivo === mesActual) setClientes([]);
         return [];
+      } finally {
+        if (mesObjetivo === mesActual) setCargando(false);
       }
-      
-      const data = await respuesta.json();
-
-      // --- 2. ORDENAMIENTO (Pendientes arriba, Pagados abajo, Alfabético) ---
-      const dataOrdenada = data.sort((a, b) => {
-        // Chequeamos si el estado es "pagado" (si en tu DB le pusiste otro nombre, cambialo acá)
-        const aPagado = a.estado === "pagado";
-        const bPagado = b.estado === "pagado";
-
-        // Si 'a' pagó y 'b' no, empujamos 'a' para el final de la lista
-        if (aPagado && !bPagado) return 1;
-        // Si 'b' pagó y 'a' no, empujamos 'b' para el final de la lista
-        if (!aPagado && bPagado) return -1;
-
-        // Si ambos están en el mismo grupo, ordenamos por nombre de la A a la Z
-        return a.nombre.localeCompare(b.nombre);
-      });
-
-      // 3. Guardamos en caché y seteamos el estado con la lista YA ordenada
-      cacheClientesPorMes.current[mesObjetivo] = dataOrdenada;
-      if (mesObjetivo === mesActual) setClientes(dataOrdenada);
-      
-      return dataOrdenada;
-      
-    } catch (error) {
-      console.error("Error al buscar clientes", error);
-      if (mesObjetivo === mesActual) setClientes([]);
-      return [];
-    } finally {
-      if (mesObjetivo === mesActual) setCargando(false);
-    }
-  }, [mesActual]);
+    },
+    [mesActual],
+  );
 
   useEffect(() => {
     obtenerClientes(mesActual, { mostrarCarga: true });
@@ -180,7 +182,7 @@ function App() {
           {/* Mostramos esto SI está cargando */}
           {cargando ? (
             <div className="text-center text-button py-10 bg-white rounded-xl shadow-sm border border-neutral-300 font-semibold animate-pulse">
-              Cargando clientes... ⏳
+              Cargando...
             </div>
           ) : (
             /* Si NO está cargando, mostramos los clientes (o el mensaje de vacío) */
