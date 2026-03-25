@@ -1,3 +1,14 @@
+// Función auxiliar para que la fecha se vea linda (DD/MM/YYYY)
+// Usamos UTC para que no se desfase el día por la zona horaria
+const formatearFecha = (fechaString) => {
+  if (!fechaString) return "";
+  const d = new Date(fechaString);
+  const dia = d.getUTCDate().toString().padStart(2, "0");
+  const mes = (d.getUTCMonth() + 1).toString().padStart(2, "0");
+  const anio = d.getUTCFullYear();
+  return `${dia}/${mes}/${anio}`;
+};
+
 export function ClientCard({
   cliente,
   mesActual,
@@ -35,7 +46,23 @@ export function ClientCard({
         <h3 className="font-bold text-neutral-800 text-lg leading-tight">
           {cliente.nombre}
         </h3>
-        <p className={`text-sm font-bold ${colorTextoEstado}`}>{textoEstado}</p>
+
+        <div className="flex flex-col mt-1">
+          {/* Muestra el estado (Pagado/Pendiente) y si está pagado, suma la fecha */}
+          <p className={`text-sm font-bold ${colorTextoEstado}`}>
+            {textoEstado}{" "}
+            {cliente.estado === "pagado" &&
+              cliente.fecha_pago_actual &&
+              `el ${formatearFecha(cliente.fecha_pago_actual)}`}
+          </p>
+
+          {/* Si NO está pagado, pero tiene un pago histórico, mostramos cuándo fue la última vez */}
+          {cliente.estado !== "pagado" && cliente.ultimo_pago && (
+            <p className="text-xs text-neutral-500 font-medium mt-0.5">
+              Último pago: {formatearFecha(cliente.ultimo_pago)}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Botones Acciones */}
