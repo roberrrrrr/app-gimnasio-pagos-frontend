@@ -57,13 +57,16 @@ export function MonthCard({ mesActual, setMesActual }) {
         type="button"
         onClick={() => cambiarDeMes(añoAnterior, mesAnterior)}
         disabled={bloquearAnterior}
-        className={`px-4 py-3 rounded-lg transition-all font-bold text-xl sm:text-base flex items-center justify-center ${
+        className={`px-4 py-3 rounded-lg transition-all flex items-center justify-center ${
           bloquearAnterior
             ? "bg-neutral-50 text-neutral-300 cursor-not-allowed"
             : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200 active:bg-neutral-300 shadow-sm"
         }`}
       >
-        &larr;{" "}
+        {/* Flecha más grande y gruesa */}
+        <span className="text-2xl sm:text-3xl font-black leading-none -mt-1">
+          &larr;
+        </span>
         <span className="hidden sm:inline ml-2 text-sm font-medium">
           {nombresMeses[mesAnterior - 1]}
         </span>
@@ -79,7 +82,7 @@ export function MonthCard({ mesActual, setMesActual }) {
         type="button"
         onClick={() => cambiarDeMes(añoSiguiente, mesSiguiente)}
         disabled={bloquearSiguiente}
-        className={`px-4 py-3 rounded-lg transition-all font-bold text-xl sm:text-base flex items-center justify-center ${
+        className={`px-4 py-3 rounded-lg transition-all flex items-center justify-center ${
           bloquearSiguiente
             ? "bg-neutral-50 text-neutral-300 cursor-not-allowed"
             : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200 active:bg-neutral-300 shadow-sm"
@@ -87,8 +90,11 @@ export function MonthCard({ mesActual, setMesActual }) {
       >
         <span className="hidden sm:inline mr-2 text-sm font-medium">
           {nombresMeses[mesSiguiente - 1]}
-        </span>{" "}
-        &rarr;
+        </span>
+        {/* Flecha más grande y gruesa */}
+        <span className="text-2xl sm:text-3xl font-black leading-none -mt-1">
+          &rarr;
+        </span>
       </button>
     </div>
   );

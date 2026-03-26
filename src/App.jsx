@@ -104,15 +104,26 @@ function App() {
   const agregarCliente = async () => {
     if (nuevoNombre.trim() === "") return;
     try {
-      await fetch(`${URL_BACKEND}/api/clientes`, {
+      const respuesta = await fetch(`${URL_BACKEND}/api/clientes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nombre: nuevoNombre }),
       });
+
+      // 1. Verificamos si el backend nos devolvió un error (ej: status 400 por duplicado)
+      if (!respuesta.ok) {
+        const errorData = await respuesta.json();
+        // Le mostramos al usuario el mensaje exacto que mandó el backend
+        alert(`No se pudo agregar: ${errorData.error}`);
+        return; // Frenamos la ejecución acá para que no limpie el input ni recargue la lista
+      }
+
+      // 2. Si todo salió bien, limpiamos el input y actualizamos la lista
       setNuevoNombre("");
       await obtenerClientes(mesActual, { forzarRefetch: true });
     } catch {
-      alert("Error al guardar cliente");
+      // Este catch atrapa errores "graves" (ej: el servidor está apagado o no hay internet)
+      alert("Error de conexión al guardar cliente");
     }
   };
 
