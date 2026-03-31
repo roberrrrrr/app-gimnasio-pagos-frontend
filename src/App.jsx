@@ -128,18 +128,54 @@ function App() {
   };
 
   const registrarPago = async (cliente_id) => {
+    // Le pedimos al profe que ingrese el número
+    const montoStr = window.prompt("Ingresá el monto que pagó el cliente:");
+
+    // Si toca "Cancelar", cortamos la función
+    if (montoStr === null) return;
+
+    // Convertimos lo que escribió a número
+    const monto = parseFloat(montoStr);
+    if (isNaN(monto) || monto <= 0) {
+      alert("Por favor ingresá un monto válido (solo números).");
+      return;
+    }
+
     try {
       await fetch(`${URL_BACKEND}/api/pagos`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cliente_id, mes: mesActual }),
+        // Ahora mandamos el monto al backend
+        body: JSON.stringify({ cliente_id, mes: mesActual, monto }),
       });
       await obtenerClientes(mesActual, { forzarRefetch: true });
     } catch {
       alert("Error al registrar el pago");
     }
   };
+  const modificarMonto = async (cliente_id, montoActual) => {
+    // Le mostramos el monto actual en la ventanita para que sea más fácil corregir
+    const montoStr = window.prompt("Corregir el monto abonado:", montoActual);
 
+    if (montoStr === null) return;
+
+    const monto = parseFloat(montoStr);
+    if (isNaN(monto) || monto <= 0) {
+      alert("Por favor ingresá un monto válido (solo números).");
+      return;
+    }
+
+    try {
+      await fetch(`${URL_BACKEND}/api/pagos`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cliente_id, mes: mesActual, monto }),
+      });
+      await obtenerClientes(mesActual, { forzarRefetch: true });
+    } catch {
+      alert("Error al modificar el monto");
+    }
+  };
   const eliminarCliente = async (id) => {
     const confirmar = window.confirm(
       "¿Seguro que querés borrar a este cliente? Se borrará su historial completo.",
@@ -155,7 +191,10 @@ function App() {
       alert("Error al eliminar cliente");
     }
   };
-
+  // Sumamos todos los montos de los clientes que ya pagaron este mes
+  const recaudacionTotal = clientes.reduce((total, cliente) => {
+    return total + (Number(cliente.monto) || 0);
+  }, 0);
   return (
     // py-4 en celu, py-8 en pc. px-2 en celu, px-4 en pc.
     <div className="min-h-screen bg-primary py-4 sm:py-8 px-2 sm:px-4">
@@ -185,7 +224,15 @@ function App() {
           mesActual={mesActual}
           setMesActual={setMesActual}
         />
-
+        {/* --- TARJETA DE RECAUDACIÓN ACUMULADA --- */}
+        <div className="bg-gradient-to-r from-success-600 to-success-500 text-white p-4 sm:p-5 rounded-xl shadow-md flex justify-between items-center mb-5">
+          <h3 className="text-lg sm:text-xl font-bold opacity-90">
+            Recaudación del mes:
+          </h3>
+          <p className="text-2xl sm:text-3xl font-black tracking-tight">
+            ${recaudacionTotal.toLocaleString("es-AR")}
+          </p>
+        </div>
         {/* --- Lista de Clientes --- */}
         {/* gap-2 para separar un poco más las tarjetas en celu */}
         {/* --- Lista de Clientes --- */}
@@ -205,6 +252,7 @@ function App() {
                   mesActual={mesActual}
                   eliminarCliente={eliminarCliente}
                   registrarPago={registrarPago}
+                  modificarMonto={modificarMonto} /* <-- Agregás esta línea */
                 />
               ))}
 

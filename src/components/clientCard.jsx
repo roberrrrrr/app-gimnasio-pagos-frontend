@@ -14,6 +14,7 @@ export function ClientCard({
   mesActual,
   eliminarCliente,
   registrarPago,
+  modificarMonto,
 }) {
   const fechaHoy = new Date();
   const mesReal = `${fechaHoy.getFullYear()}-${(fechaHoy.getMonth() + 1).toString().padStart(2, "0")}`;
@@ -48,7 +49,6 @@ export function ClientCard({
         </h3>
 
         <div className="flex flex-col mt-1">
-          {/* Muestra el estado (Pagado/Pendiente) y si está pagado, suma la fecha */}
           <p className={`text-sm font-bold ${colorTextoEstado}`}>
             {textoEstado}{" "}
             {cliente.estado === "pagado" &&
@@ -56,9 +56,16 @@ export function ClientCard({
               `el ${formatearFecha(cliente.fecha_pago_actual)}`}
           </p>
 
-          {/* Si NO está pagado, pero tiene un pago histórico, mostramos cuándo fue la última vez */}
+          {/* Si está pagado, mostramos el monto abonado */}
+          {cliente.estado === "pagado" && cliente.monto && (
+            <p className="text-xs text-success-700 bg-success-50 inline-block px-2 py-0.5 rounded-md mt-1 w-fit border border-success-200 font-semibold">
+              Abonó: ${Number(cliente.monto).toLocaleString("es-AR")}
+            </p>
+          )}
+
+          {/* Si NO está pagado, mostramos cuándo fue la última vez */}
           {cliente.estado !== "pagado" && cliente.ultimo_pago && (
-            <p className="text-xs text-neutral-500 font-medium mt-0.5">
+            <p className="text-xs text-neutral-500 font-medium mt-1">
               Último pago: {formatearFecha(cliente.ultimo_pago)}
             </p>
           )}
@@ -77,7 +84,14 @@ export function ClientCard({
             Marcar Pagado
           </button>
         )}
-
+        {cliente.estado === "pagado" && (
+          <button
+            onClick={() => modificarMonto(cliente.id, cliente.monto)}
+            className="text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors border border-blue-200"
+          >
+            Editar Monto
+          </button>
+        )}
         <button
           onClick={() => eliminarCliente(cliente.id)}
           className="text-error-600 hover:bg-error-50 px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors border border-transparent hover:border-error-100"
