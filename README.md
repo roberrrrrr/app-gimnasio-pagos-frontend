@@ -2,7 +2,7 @@
 
 Interfaz de usuario para la solución integral B2B de administración financiera de centros deportivos. 
 
-> 🔗 **Nota:** Este repositorio contiene únicamente el Frontend. El código del Backend (API y Base de Datos) se encuentra en [AQUÍ PONÉ EL LINK DE TU REPO DEL BACKEND].
+> 🔗 **Nota:** Este repositorio contiene únicamente el Frontend. El código del Backend (API y Base de Datos) se encuentra en [(https://github.com/roberrrrrr/app-gimnasio-pagos-backend.git)].
 
 ### 🌟 Características de la UI
 - **Panel Administrativo Responsivo:** Diseño optimizado ("Mobile First") para su uso ágil por parte del personal.
