@@ -1,16 +1,19 @@
-# React + Vite
+# Sistema de Gestión de Gimnasios - Frontend 🏋️‍♂️💻
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interfaz de usuario para la solución integral B2B de administración financiera de centros deportivos. 
 
-Currently, two official plugins are available:
+> 🔗 **Nota:** Este repositorio contiene únicamente el Frontend. El código del Backend (API y Base de Datos) se encuentra en [AQUÍ PONÉ EL LINK DE TU REPO DEL BACKEND].
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### 🌟 Características de la UI
+- **Panel Administrativo Responsivo:** Diseño optimizado ("Mobile First") para su uso ágil por parte del personal.
+- **Gestión Visual:** Interfaces claras para el control de mensualidades, estados de cuenta y detección de duplicados.
+- **Dashboards:** Visualización de recaudación acumulada de forma amigable.
 
-## React Compiler
+### 🛠️ Stack Tecnológico (Frontend)
+- **Framework:** React.js
+- **Estilos:** Tailwind CSS, HTML5, CSS3.
+- **Despliegue:** Vercel (CI/CD configurado).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 🚀 Desafíos Técnicos
+- Optimización del rendimiento en la carga de listas grandes de socios.
+- Diseño de una experiencia de usuario (UX) fluida para operaciones administrativas rápidas.
