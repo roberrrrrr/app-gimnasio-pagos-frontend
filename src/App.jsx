@@ -178,7 +178,7 @@ function App() {
   };
   const eliminarCliente = async (id) => {
     const confirmar = window.confirm(
-      "¿Seguro que querés borrar a este cliente? Se borrará su historial completo.",
+      "¿Seguro que querés dar de baja a este cliente? No aparecerá a partir de este mes, pero su historial de pagos se conserva.",
     );
     if (!confirmar) return;
 
@@ -188,7 +188,7 @@ function App() {
       });
       await obtenerClientes(mesActual, { forzarRefetch: true });
     } catch {
-      alert("Error al eliminar cliente");
+      alert("Error al dar de baja cliente");
     }
   };
   // Sumamos todos los montos de los clientes que ya pagaron este mes

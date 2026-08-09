@@ -96,7 +96,7 @@ export function ClientCard({
           onClick={() => eliminarCliente(cliente.id)}
           className="text-error-600 hover:bg-error-50 px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors border border-transparent hover:border-error-100"
         >
-          Eliminar
+          Dar de baja
         </button>
       </div>
     </div>
