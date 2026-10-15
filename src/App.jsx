@@ -110,7 +110,30 @@ function App() {
         body: JSON.stringify({ nombre: nuevoNombre }),
       });
 
-      // 1. Verificamos si el backend nos devolvió un error (ej: status 400 por duplicado)
+      // 1. Existe un cliente DADO DE BAJA con ese nombre: pedimos confirmación previa.
+      if (respuesta.status === 409) {
+        const data = await respuesta.json();
+        const confirmar = window.confirm(
+          `Ya existe un cliente dado de baja llamado "${data.cliente.nombre}".\n\n¿Querés reactivarlo? Se conserva todo su historial de pagos.`,
+        );
+        if (!confirmar) return; // El usuario decidió no reactivar: no cambiamos nada.
+
+        const reactivacion = await fetch(
+          `${URL_BACKEND}/api/clientes/${data.cliente.id}/reactivar`,
+          { method: "PUT" },
+        );
+        if (!reactivacion.ok) {
+          const err = await reactivacion.json();
+          alert(`No se pudo reactivar: ${err.error}`);
+          return;
+        }
+
+        setNuevoNombre("");
+        await obtenerClientes(mesActual, { forzarRefetch: true });
+        return;
+      }
+
+      // 2. Otros errores del backend (ej: status 400 por duplicado activo)
       if (!respuesta.ok) {
         const errorData = await respuesta.json();
         // Le mostramos al usuario el mensaje exacto que mandó el backend
@@ -118,7 +141,7 @@ function App() {
         return; // Frenamos la ejecución acá para que no limpie el input ni recargue la lista
       }
 
-      // 2. Si todo salió bien, limpiamos el input y actualizamos la lista
+      // 3. Si todo salió bien, limpiamos el input y actualizamos la lista
       setNuevoNombre("");
       await obtenerClientes(mesActual, { forzarRefetch: true });
     } catch {
